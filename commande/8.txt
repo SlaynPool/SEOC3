@@ -1,0 +1,7 @@
+nmap -sP 10.202.0.*
+Starting Nmap 7.80 ( https://nmap.org ) at 2019-11-20 15:35 CET
+Nmap scan report for 10.202.0.52
+Host is up (0.00062s latency).
+Nmap scan report for 10.202.0.60
+Host is up (0.0011s latency).
+...

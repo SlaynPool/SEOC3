@@ -1,0 +1,108 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[utf8]{inputenc}
+% \usepackage[latin1]{inputenc}
+
+%opening
+\title{SEOC3 – TP 01 – Installation de raspbian sur un Raspberry Pi}
+\author{Nicolas Vadkerti}
+\usepackage{listings} % Required for inserting code snippets
+\usepackage[usenames,dvipsnames]{color} % Required for specifying custom colors and referring to colors by name
+
+\definecolor{DarkGreen}{rgb}{0.0,0.4,0.0} % Comment color
+\definecolor{highlight}{RGB}{255,251,204} % Code highlight color
+
+\lstdefinestyle{Style1}{ % Define a style for your code snippet, multiple definitions can be made if, for example, you wish to insert multiple code snippets using different programming languages into one document
+language=Perl, % Detects keywords, comments, strings, functions, etc for the language specified
+backgroundcolor=\color{highlight}, % Set the background color for the snippet - useful for highlighting
+basicstyle=\footnotesize\ttfamily, % The default font size and style of the code
+breakatwhitespace=false, % If true, only allows line breaks at white space
+breaklines=true, % Automatic line breaking (prevents code from protruding outside the box)
+captionpos=b, % Sets the caption position: b for bottom; t for top
+commentstyle=\usefont{T1}{pcr}{m}{sl}\color{DarkGreen}, % Style of comments within the code - dark green courier font
+deletekeywords={}, % If you want to delete any keywords from the current language separate them by commas
+%escapeinside={\%}, % This allows you to escape to LaTeX using the character in the bracket
+firstnumber=1, % Line numbers begin at line 1
+frame=single, % Frame around the code box, value can be: none, leftline, topline, bottomline, lines, single, shadowbox
+frameround=tttt, % Rounds the corners of the frame for the top left, top right, bottom left and bottom right positions
+keywordstyle=\color{Blue}\bf, % Functions are bold and blue
+morekeywords={}, % Add any functions no included by default here separated by commas
+numbers=left, % Location of line numbers, can take the values of: none, left, right
+numbersep=10pt, % Distance of line numbers from the code box
+numberstyle=\tiny\color{Gray}, % Style used for line numbers
+rulecolor=\color{black}, % Frame border color
+showstringspaces=false, % Don't put marks in string spaces
+showtabs=false, % Display tabs in the code as lines
+stepnumber=5, % The step distance between line numbers, i.e. how often will lines be numbered
+stringstyle=\color{Purple}, % Strings are purple
+tabsize=2
+}
+
+\newcommand{\insertcode}[2]{\begin{itemize}\item[]\lstinputlisting[caption=#2,label=#1,style=Style1]{#1}\end{itemize}} 
+
+
+% \insertcode{"Scripts/example.pl"}{Nena would be proud.} 
+
+\begin{document}
+
+\maketitle
+
+
+
+\section{Téléchargement et installation de raspbian sur la carte microSD}
+\subsection{Sur votre machine Linux, brancher le lecteur de cartes microSD USB et y insérer la carte SD de 16GB. Déterminer avec lsblk le périphérique de bloc correspondant à la carte microSD.}
+
+
+\insertcode{commande/1.txt}{LSBLK output}
+
+\subsection{Installation}
+Il suffit de suivre les instructions du tp, je ne détaillerai donc pas ici.
+
+\subsection{Combien de paquets sont installés sur le système (sudo dpkg -l |wc -l)?}
+\insertcode{commande/2.txt}{dpkg output}
+\newpage
+\subsection{Quelles sont les services activer de base}
+\insertcode{commande/3.txt}{Service activé de base}
+\subsection{Quel est le paramétrage réseau par défaut?}
+Le RPi Se comporte comme beaucoup d'ordinateur avec des distributions courantes. Si un cable réseau est connecté, il va essayé de ``s'autoconfiguré''  via DHCP. Mon rapsberry a donc récupéré une addresse dans le plan d'addressage de la salle.
+
+
+
+
+
+\section{Paramétrage du système à ``chaud''}
+\subsection{Comment changer le nom par défaut du RPi (voir fichiers /etc/hostname et /etc/hosts)?Par exemple pi202-xx pour le poste informatique xx de la salle 202}
+Il suffit d'éditer /etc/hostname et /etc/hosts pour qu'il soit comme ceci :
+\insertcode{commande/4.txt}{Changement d'hostname}
+\newpage
+\subsection{Quel utilisateur existe sur le Rpi et à quel(s) groupe(s) appartient-il}
+\insertcode{commande/5.txt}{liste des Users sur la machine}
+Seul pi est dans different groupe:
+\insertcode{commande/6.txt}{groupe de pi }
+\newpage
+\subsection{Comment paramétrer le système pour avoir le clavier en Français?}
+On peut utiliser la commande raspi-config qui, à l'aide d'un menu, permet de paramétrer facillement les options habituelles.
+
+\subsection{Comment changer le nom de l’utilisateur pi en ido ainsi que le mot de passe (voir usermod oudirectement   les   fichiers   /etc/passwd,   /etc/group,   /etc/shadow   et/etc/sudoers.d/010pi-nopasswd)?}
+Il suffit d'utiliser la commande usermode -l ido pi pour changer de username.
+Si l'utilisateur a des proccessus fils cette commande peut etre utile:
+
+\insertcode{commande/7.txt}{pkill tips}
+
+\subsection{Quelle adresse IP lui est attribuée? Comment peut-on la déterminer sans utiliser l’écran?}
+On peut utiliser nmap pour trouver sont pi:
+\insertcode{commande/8.txt}{nmap search}
+\newpage
+\subsection{Comment alors paramétrer le RPi pour qu’il utilise une adresse IP connue (fixe)? Par exemple10.203.xx.2/16 où xx est le numéro de votre poste informatique.}
+Pour cela, il faut utiliser le fichier /etc/dhcpcd.conf, en voici un exemple pour repondre à la question :
+
+\insertcode{commande/9.txt}{/etc/dhcpcd.conf}
+\subsection{Comment activer le service SSH au démarrage du RPi?}
+L'utilisation de systemctl permet de faire ca:
+\insertcode{commande/10.txt}{systemctl}
+\section{Paramétrage du système ``à froid'' avec un ``chroot'' }
+Sur ma pauvre ArchLinux, je devais faire les mises a jours. Ca ne c'est pas forcement bien passé. J'avais pas d'interface loop0. J'ai deja utiliser chroot lors d'install de gentoo. L'idée est de monter toutes les partitions du nouveau systeme sur le FHS du systeme hote. Une fois cette etapes faite, chroot va ce charger de ``deplacer'' notre ``/'' au niveau du ``/'' du nouveau système. De plus, dès que nous serons dans notre ``fake /''  nous utiliserons tous les bin de notre nouveau système. Nous serons donc pour de vrai en train d'interagir avec le nouveau systeme. Cela est possible car toutes les configurations de linux sont des fichiers textes. On peut donc les modifiers à partir de n'importe quelle systeme exterieur.\\
+Pour repondre au question du tp, il suffit donc de refaire les manipulations vu dans le §2 dans notre chroot\\
+
+Une fois tous les modifications faite sur notre systeme, il faut bien penser a demonter toutes les partitions de notre système hôte. Le nouveau système sera pret à l'emploi, avec les  modifications fais précedement. 
+
+\end{document}

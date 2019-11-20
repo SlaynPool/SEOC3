@@ -1,0 +1,19 @@
+pi@raspberrypi:~ $ service --status-all |grep +
+ [ + ]  alsa-utils
+ [ + ]  avahi-daemon
+ [ + ]  bluetooth
+ [ + ]  cron
+ [ + ]  dbus
+ [ + ]  dhcpcd
+ [ + ]  dphys-swapfile
+ [ + ]  fake-hwclock
+ [ + ]  kmod
+ [ + ]  networking
+ [ + ]  procps
+ [ + ]  raspi-config
+ [ ? ]  rng-tools
+ [ + ]  rsyslog
+ [ + ]  ssh
+ [ + ]  triggerhappy
+ [ + ]  udev
+

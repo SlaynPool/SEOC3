@@ -1,0 +1,14 @@
+root@raspberrypi:~# cat /etc/dhcpcd.conf 
+# A sample configuration for dhcpcd.
+# See dhcpcd.conf(5) for details.
+
+# Allow users of this group to interact with dhcpcd via the control socket.
+#controlgroup wheel
+
+....
+interface eth0
+static ip_address=10.202.19.2/16
+#static ip6_address=fd51:42f8:caae:d92e::ff/64
+static routers=10.202.255.254
+static domain_name_servers=10.255.255.200
+....
